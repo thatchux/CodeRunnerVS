@@ -1,25 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using Microsoft.ApplicationInsights;
 
 namespace CodeRunner
 {
-    static class AppInsightsClient
+  static class AppInsightsClient
+  {
+    static readonly TelemetryClient telemetry;
+
+    static AppInsightsClient()
     {
-        static readonly TelemetryClient telemetry;
-
-        static AppInsightsClient()
+      // Read instrumentation key from environment to allow opt-out or custom keys.
+      // If the env var is missing or empty, telemetry is disabled (telemetry == null).
+      try
+      {
+        var key = Environment.GetEnvironmentVariable("CODERUNNER_APPINSIGHTS_KEY");
+        if (!string.IsNullOrWhiteSpace(key))
         {
-            telemetry = new TelemetryClient();
-            telemetry.InstrumentationKey = "a30bcc73-ded9-46f2-b664-c6ed415bd393";
+          telemetry = new TelemetryClient();
+          telemetry.InstrumentationKey = key;
         }
-
-        public static void trackEvent(string eventName)
+        else
         {
-            telemetry.TrackEvent(eventName);
+          telemetry = null;
         }
+      }
+      catch
+      {
+        telemetry = null;
+      }
     }
+
+    public static void trackEvent(string eventName)
+    {
+      try
+      {
+        telemetry?.TrackEvent(eventName);
+      }
+      catch
+      {
+        // swallow telemetry exceptions to avoid affecting the host.
+      }
+    }
+  }
 }
