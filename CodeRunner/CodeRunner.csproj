@@ -55,6 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunCommand.cs" />
     <Compile Include="RunCommandPackage.cs" />
+    <Compile Include="RunOptionsPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CHANGELOG.md" />
